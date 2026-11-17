@@ -28,7 +28,7 @@
 
 CREATE TABLE countries (
 
-    country_id integer,
+    country_id serial,
     country_shortname varchar(64) NOT NULL,
     country_fullname varchar(64) NOT NULL,
 
@@ -49,7 +49,7 @@ CREATE TABLE countries (
 
 CREATE TABLE clubs (
 
-    club_id integer,
+    club_id serial,
     short_name varchar(64) NOT NULL,
     full_name varchar(64) NOT NULL,
 
@@ -58,7 +58,7 @@ CREATE TABLE clubs (
 
 CREATE TABLE players (
 
-    player_id integer,
+    player_id serial,
     first_name varchar(64) NOT NULL,
     last_name varchar(64) NOT NULL,
 
@@ -70,7 +70,7 @@ CREATE TABLE players (
 
 CREATE TABLE teams (
 
-    team_id integer,
+    team_id serial,
     country_id integer REFERENCES countries (country_id),
     club_id integer REFERENCES clubs (club_id),
     CHECK (
@@ -94,7 +94,7 @@ CREATE TABLE team_players (
 );
 
 CREATE TABLE bracket (
-    match_id integer,
+    match_id serial,
     team_1_id integer NOT NULL REFERENCES teams (team_id),
     team_2_id integer NOT NULL REFERENCES teams (team_id),
 
@@ -125,7 +125,7 @@ CREATE TABLE bracket (
 
 CREATE TABLE team_results (
 
-    match_id integer REFERENCES bracket (match_id),
+    match_id integer NOT NULL REFERENCES bracket (match_id),
 
     team_1_score smallint NOT NULL,
     team_1_penalties smallint,
@@ -141,6 +141,11 @@ CREATE TABLE team_results (
         AND team_2_score >= 0
         AND team_1_group_score >= 0
         AND team_2_group_score >= 0
+    ),
+    CHECK (
+        (team_1_penalties IS NULL OR team_1_penalties >= 0)
+        AND
+        (team_2_penalties IS NULL OR team_2_penalties >= 0)
     ),
     PRIMARY KEY (match_id)
 );
